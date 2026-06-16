@@ -286,6 +286,3 @@ print(f"\nPHASE 2 RECOMMENDATIONS:")
 for r in recommendations:
     print(f"  {r['algorithm']:<14} passed {r['sub_phases_passed']}/3  →  {r['recommendation']}")
 
-git add -A
-git commit -m "Complete Phase 1 summary JSON with baseline comparisons and Phase 2 recommendations"
-git push
