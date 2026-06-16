@@ -1,0 +1,11 @@
+sub_phase,metric,test,statistic,p_value,significant,n_groups
+sparse,path_smoothness_msj,Kruskal-Wallis,8.344734982332147,0.4005400928925733,False,9
+sparse,path_planning_time,Kruskal-Wallis,39.70333333333332,3.6381717415811625e-06,True,9
+sparse,path_execution_time,ANOVA,0.005377745600781409,0.9999999879467938,False,9
+sparse,path_optimality_ratio,ANOVA,2.8755092668792326,0.018803288374493913,True,9
+moderate,path_smoothness_msj,Kruskal-Wallis,10.040729312762977,0.12294726545608284,False,7
+moderate,path_planning_time,Kruskal-Wallis,29.893333333333345,4.118693372177684e-05,True,7
+moderate,path_execution_time,ANOVA,0.27820970008034424,0.9424606973157287,False,7
+dense,path_smoothness_msj,Kruskal-Wallis,7.515151515151516,0.023340254280134733,True,3
+dense,path_planning_time,Kruskal-Wallis,8.727272727272727,0.012732005168249957,True,3
+dense,path_execution_time,ANOVA,2.055374019480602,0.19040400211821848,False,3

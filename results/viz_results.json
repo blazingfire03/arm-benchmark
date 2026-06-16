@@ -1,0 +1,54 @@
+[
+  {
+    "planner": "a_star",
+    "case_index": 12,
+    "test_case_id": 12,
+    "planning_success": true,
+    "collision": false,
+    "n_collision_waypoints": 0,
+    "path_planning_time": 0.011228011000184779,
+    "path_execution_time": 5.608333333333333,
+    "total_time": 5.619561344333518,
+    "path_smoothness_msj": 0.7251524238917465,
+    "path_distance_raw": 2.8054908349004863,
+    "path_distance_optimal": 2.8050745507630452,
+    "path_optimality_ratio": 1.0001484039478836,
+    "waypoint_count": 1346,
+    "start_ee": [
+      -0.26916125416755676,
+      0.1846868097782135,
+      1.4458481073379517
+    ],
+    "goal_ee": [
+      -0.12243641167879105,
+      0.48426756262779236,
+      0.8405482172966003
+    ]
+  },
+  {
+    "planner": "min_jerk",
+    "case_index": 12,
+    "test_case_id": 12,
+    "planning_success": true,
+    "collision": false,
+    "n_collision_waypoints": 0,
+    "path_planning_time": 0.0003080730002693599,
+    "path_execution_time": 5.608333333333333,
+    "total_time": 5.608641406333603,
+    "path_smoothness_msj": 0.7251524238465034,
+    "path_distance_raw": 2.8054908349004863,
+    "path_distance_optimal": 2.8050745507630452,
+    "path_optimality_ratio": 1.0001484039478836,
+    "waypoint_count": 1346,
+    "start_ee": [
+      -0.26916125416755676,
+      0.1846868097782135,
+      1.4458481073379517
+    ],
+    "goal_ee": [
+      -0.12243641167879105,
+      0.48426756262779236,
+      0.8405482172966003
+    ]
+  }
+]

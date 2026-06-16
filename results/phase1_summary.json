@@ -1,0 +1,3420 @@
+{
+  "experiment": {
+    "name": "Phase 1: Fixed Obstacle Evaluation",
+    "robot": "Franka Emika Panda 7-DOF",
+    "simulator": "PyBullet",
+    "sub_phases": {
+      "sparse": {
+        "obstacle_count": 4,
+        "target_collision_rate": "<=20%"
+      },
+      "moderate": {
+        "obstacle_count": 12,
+        "target_collision_rate": "50-70%"
+      },
+      "dense": {
+        "obstacle_count": 16,
+        "target_collision_rate": ">=95%"
+      }
+    },
+    "total_trials": 135,
+    "metrics_explanation": {
+      "MSJ": "Mean Squared Jerk (rad\u00b2/s\u2075) \u2014 lower is smoother. Min-jerk is the theoretical minimum.",
+      "planning_time": "Wall-clock time to compute path (s) \u2014 lower is faster. Min-jerk is near-instant.",
+      "execution_time": "Time to traverse planned path in simulation (s) \u2014 lower means shorter/faster path.",
+      "POR": "Path Optimality Ratio = d_path / d_optimal. 1.0 = matched A* optimal. Higher = more detour.",
+      "collision_rate": "% of trials where arm hit an obstacle. 0% ideal. A* is 0% by construction.",
+      "success_rate": "% of trials where planner found a path. 100% ideal."
+    },
+    "baseline_framing": {
+      "description": "All 7 algorithms are evaluated between two baselines that bound the performance space.",
+      "floor_baseline": "min_jerk \u2014 obstacle-blind, mathematically smoothest, near-instant planning, HIGH collision rate.",
+      "ceiling_baseline": "A* \u2014 optimal collision-free path, provides d_optimal for POR, SLOW planning, 0% collision.",
+      "pass_criteria": "collision < min_jerk AND planning_time < A* AND success >= 80%"
+    }
+  },
+  "baselines": {
+    "a_star": {
+      "algorithm": "a_star",
+      "role": "ceiling_baseline",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 4,
+          "success_rate_pct": 80.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 4.509978,
+              "std": 7.302827,
+              "median": 1.127737,
+              "min": 0.37184,
+              "max": 15.412597,
+              "p25": 0.376657,
+              "p75": 5.261057,
+              "count": 4
+            },
+            "path_planning_time": {
+              "mean": 6.053376,
+              "std": 13.460384,
+              "median": 0.042224,
+              "min": 0.014179,
+              "max": 30.13203,
+              "p25": 0.027468,
+              "p75": 0.050981,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.064583,
+              "std": 1.93675,
+              "median": 5.510417,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 3.967708,
+              "p75": 6.607292,
+              "count": 4
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 1,
+          "success_rate_pct": 20.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 1.919133,
+              "std": NaN,
+              "median": 1.919133,
+              "min": 1.919133,
+              "max": 1.919133,
+              "p25": 1.919133,
+              "p75": 1.919133,
+              "count": 1
+            },
+            "path_planning_time": {
+              "mean": 24.068451,
+              "std": 13.433807,
+              "median": 30.062501,
+              "min": 0.037358,
+              "max": 30.109551,
+              "p25": 30.051795,
+              "p75": 30.081051,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 4.395833,
+              "std": NaN,
+              "median": 4.395833,
+              "min": 4.395833,
+              "max": 4.395833,
+              "p25": 4.395833,
+              "p75": 4.395833,
+              "count": 1
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 0,
+          "success_rate_pct": 0.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": null,
+            "path_planning_time": {
+              "mean": 30.063214,
+              "std": 0.017985,
+              "median": 30.069913,
+              "min": 30.033792,
+              "max": 30.081094,
+              "p25": 30.060543,
+              "p75": 30.070725,
+              "count": 5
+            },
+            "path_execution_time": null,
+            "path_optimality_ratio": null
+          }
+        }
+      },
+      "overall": {
+        "trials": 15,
+        "success_count": 5,
+        "success_rate_pct": 33.3,
+        "collision_count": 0,
+        "collision_rate_pct": 0.0,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 3.991809,
+            "std": 6.429693,
+            "median": 1.877211,
+            "min": 0.37184,
+            "max": 15.412597,
+            "p25": 0.378263,
+            "p75": 1.919133,
+            "count": 5
+          },
+          "path_planning_time": {
+            "mean": 20.06168,
+            "std": 14.658457,
+            "median": 30.060543,
+            "min": 0.014179,
+            "max": 30.13203,
+            "p25": 0.046603,
+            "p75": 30.075888,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 4.930833,
+            "std": 1.70373,
+            "median": 4.420833,
+            "min": 2.608333,
+            "max": 6.629167,
+            "p25": 4.395833,
+            "p75": 6.6,
+            "count": 5
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "min_jerk": {
+      "algorithm": "min_jerk",
+      "role": "floor_baseline",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 1,
+          "collision_rate_pct": 20.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 3.828432,
+              "std": 6.505458,
+              "median": 1.10225,
+              "min": 0.37184,
+              "max": 15.412597,
+              "p25": 0.378263,
+              "p75": 1.877211,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.000113,
+              "std": 3.4e-05,
+              "median": 0.000114,
+              "min": 6.4e-05,
+              "max": 0.000146,
+              "p25": 9.8e-05,
+              "p75": 0.000143,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.061667,
+              "std": 1.677288,
+              "median": 5.05,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 4,
+          "collision_rate_pct": 80.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 1.167459,
+              "std": 1.170903,
+              "median": 0.408506,
+              "min": 0.248291,
+              "max": 2.869434,
+              "p25": 0.391933,
+              "p75": 1.919133,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.000127,
+              "std": 2.8e-05,
+              "median": 0.000115,
+              "min": 0.000105,
+              "max": 0.000174,
+              "p25": 0.000111,
+              "p75": 0.00013,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.744167,
+              "std": 1.469994,
+              "median": 6.475,
+              "min": 3.975,
+              "max": 7.333333,
+              "p25": 4.395833,
+              "p75": 6.541667,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 5,
+          "collision_rate_pct": 100.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 0.684069,
+              "std": 0.35301,
+              "median": 0.724664,
+              "min": 0.159248,
+              "max": 1.015819,
+              "p25": 0.53704,
+              "p75": 0.983574,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.000145,
+              "std": 7.2e-05,
+              "median": 0.000131,
+              "min": 9.1e-05,
+              "max": 0.000268,
+              "p25": 9.6e-05,
+              "p75": 0.000141,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.04,
+              "std": 1.258104,
+              "median": 5.608333,
+              "min": 5.154167,
+              "max": 8.195833,
+              "p25": 5.195833,
+              "p75": 6.045833,
+              "count": 5
+            },
+            "path_optimality_ratio": null
+          }
+        }
+      },
+      "overall": {
+        "trials": 15,
+        "success_count": 15,
+        "success_rate_pct": 100.0,
+        "collision_count": 10,
+        "collision_rate_pct": 66.7,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 1.89332,
+            "std": 3.816651,
+            "median": 0.724664,
+            "min": 0.159248,
+            "max": 15.412597,
+            "p25": 0.385098,
+            "p75": 1.489731,
+            "count": 15
+          },
+          "path_planning_time": {
+            "mean": 0.000128,
+            "std": 4.7e-05,
+            "median": 0.000115,
+            "min": 6.4e-05,
+            "max": 0.000268,
+            "p25": 0.000102,
+            "p75": 0.000142,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 5.615278,
+            "std": 1.432915,
+            "median": 5.608333,
+            "min": 2.608333,
+            "max": 8.195833,
+            "p25": 4.735417,
+            "p75": 6.570833,
+            "count": 15
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    }
+  },
+  "algorithms": {
+    "RRT": {
+      "algorithm": "RRT",
+      "role": "sampling_based",
+      "paradigm": "sampling",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 385655.082732,
+              "std": 862340.896264,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 1928257.373751,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.097626,
+              "std": 0.052657,
+              "median": 0.078476,
+              "min": 0.040037,
+              "max": 0.17156,
+              "p25": 0.067903,
+              "p75": 0.130157,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.1175,
+              "std": 1.681443,
+              "median": 5.329167,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 385655.08,
+              "min_jerk": 3.83,
+              "ratio": 100734.5,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0976,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 865.4,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0976,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 62.0,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.10s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 4147578.995382,
+              "std": 3467757.488845,
+              "median": 3220053.280878,
+              "min": 1.919133,
+              "max": 9302091.495211,
+              "p25": 2791341.499882,
+              "p75": 5424406.781804,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.137642,
+              "std": 0.106751,
+              "median": 0.146428,
+              "min": 0.035269,
+              "max": 0.303013,
+              "p25": 0.051244,
+              "p75": 0.152255,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.64,
+              "std": 1.95946,
+              "median": 6.708333,
+              "min": 4.395833,
+              "max": 9.008333,
+              "p25": 5.0125,
+              "p75": 8.075,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 80.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 4147579.0,
+              "min_jerk": 1.17,
+              "ratio": 3552653.8,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.1376,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 1083.3,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.1376,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 174.9,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.14s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 2,
+          "success_rate_pct": 40.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 2179608.350688,
+              "std": 568156.142076,
+              "median": 2179608.350688,
+              "min": 1777861.289854,
+              "max": 2581355.411523,
+              "p25": 1978734.820271,
+              "p75": 2380481.881106,
+              "count": 2
+            },
+            "path_planning_time": {
+              "mean": 3.034985,
+              "std": 2.691132,
+              "median": 5.000253,
+              "min": 0.070733,
+              "max": 5.000366,
+              "p25": 0.103314,
+              "p75": 5.000256,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.989583,
+              "std": 2.212655,
+              "median": 6.989583,
+              "min": 5.425,
+              "max": 8.554167,
+              "p25": 6.207292,
+              "p75": 7.771875,
+              "count": 2
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 100.0,
+              "improvement_pct": 100.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 2179608.35,
+              "min_jerk": 0.68,
+              "ratio": 3186241.9,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 3.035,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 20867.4,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 3.035,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 9.9,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "3.03s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "40.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 40% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 2,
+        "sub_phases_total": 3,
+        "recommendation": "ADVANCE TO PHASE 2"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 12,
+        "success_rate_pct": 80.0,
+        "collision_count": 0,
+        "collision_rate_pct": 0.0,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 2252115.590996,
+            "std": 2808938.541419,
+            "median": 1853059.331802,
+            "min": 0.37184,
+            "max": 9302091.495211,
+            "p25": 1.908653,
+            "p75": 2898519.445131,
+            "count": 12
+          },
+          "path_planning_time": {
+            "mean": 1.090084,
+            "std": 2.024832,
+            "median": 0.130157,
+            "min": 0.035269,
+            "max": 5.000366,
+            "p25": 0.069318,
+            "p75": 0.237286,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.063889,
+            "std": 1.892915,
+            "median": 6.0125,
+            "min": 2.608333,
+            "max": 9.008333,
+            "p25": 4.864583,
+            "p75": 7.05,
+            "count": 12
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "RRT-Connect": {
+      "algorithm": "RRT-Connect",
+      "role": "sampling_based",
+      "paradigm": "sampling",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 748039.748554,
+              "std": 1672657.643033,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 3740180.702858,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.04182,
+              "std": 0.01868,
+              "median": 0.039558,
+              "min": 0.023962,
+              "max": 0.071433,
+              "p25": 0.028418,
+              "p75": 0.045728,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.191667,
+              "std": 1.701177,
+              "median": 5.7,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 748039.75,
+              "min_jerk": 3.83,
+              "ratio": 195390.6,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0418,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 370.7,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0418,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 144.7,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.04s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 5686566.529048,
+              "std": 6158203.931819,
+              "median": 4660806.779547,
+              "min": 1.919133,
+              "max": 15502961.324115,
+              "p25": 1208316.253365,
+              "p75": 7060746.369083,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.072891,
+              "std": 0.028433,
+              "median": 0.08382,
+              "min": 0.035245,
+              "max": 0.099122,
+              "p25": 0.050675,
+              "p75": 0.095595,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.33,
+              "std": 1.542858,
+              "median": 6.958333,
+              "min": 4.395833,
+              "max": 7.85,
+              "p25": 4.9875,
+              "p75": 7.458333,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 80.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 5686566.53,
+              "min_jerk": 1.17,
+              "ratio": 4870890.3,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0729,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 573.7,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0729,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 330.2,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.07s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 2,
+          "success_rate_pct": 40.0,
+          "collision_count": 1,
+          "collision_rate_pct": 50.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 7509690.802215,
+              "std": 4244896.497167,
+              "median": 7509690.802215,
+              "min": 4508095.703633,
+              "max": 10511285.900796,
+              "p25": 6008893.252924,
+              "p75": 9010488.351505,
+              "count": 2
+            },
+            "path_planning_time": {
+              "mean": 3.173694,
+              "std": 2.511501,
+              "median": 5.000315,
+              "min": 0.113498,
+              "max": 5.000461,
+              "p25": 0.75387,
+              "p75": 5.000324,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 7.839583,
+              "std": 1.558581,
+              "median": 7.839583,
+              "min": 6.7375,
+              "max": 8.941667,
+              "p25": 7.288542,
+              "p75": 8.390625,
+              "count": 2
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 50.0,
+              "min_jerk": 100.0,
+              "improvement_pct": 50.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 7509690.8,
+              "min_jerk": 0.68,
+              "ratio": 10977977.4,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 3.1737,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 21821.1,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 50.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 50.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 3.1737,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 9.5,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "50.0% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "3.17s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "40.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 40% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 2,
+        "sub_phases_total": 3,
+        "recommendation": "ADVANCE TO PHASE 2"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 12,
+        "success_rate_pct": 80.0,
+        "collision_count": 1,
+        "collision_rate_pct": 8.3,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 3932701.082703,
+            "std": 4977992.049474,
+            "median": 2474248.478111,
+            "min": 0.37184,
+            "max": 15502961.324115,
+            "p25": 1.908653,
+            "p75": 5260791.676931,
+            "count": 12
+          },
+          "path_planning_time": {
+            "mean": 1.096135,
+            "std": 2.028537,
+            "median": 0.08382,
+            "min": 0.023962,
+            "max": 5.000461,
+            "p25": 0.042643,
+            "p75": 0.433684,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.107292,
+            "std": 1.757279,
+            "median": 6.614583,
+            "min": 2.608333,
+            "max": 8.941667,
+            "p25": 4.845833,
+            "p75": 7.083333,
+            "count": 12
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "RRT*": {
+      "algorithm": "RRT*",
+      "role": "sampling_based",
+      "paradigm": "sampling",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 109749.253549,
+              "std": 245396.70688,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 548728.227834,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 5.040198,
+              "std": 0.025355,
+              "median": 5.048373,
+              "min": 5.003684,
+              "max": 5.070752,
+              "p25": 5.028241,
+              "p75": 5.049941,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.0775,
+              "std": 1.677523,
+              "median": 5.129167,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 109749.25,
+              "min_jerk": 3.83,
+              "ratio": 28666.9,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0402,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 44678.7,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0402,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 1.2,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "5.04s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 1,
+          "collision_rate_pct": 20.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 5778196.508427,
+              "std": 9880917.702012,
+              "median": 1247641.401755,
+              "min": 1.919133,
+              "max": 23222619.494974,
+              "p25": 359702.377156,
+              "p75": 4061017.349116,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 5.072639,
+              "std": 0.03357,
+              "median": 5.084594,
+              "min": 5.020456,
+              "max": 5.103745,
+              "p25": 5.059416,
+              "p75": 5.094986,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.273333,
+              "std": 1.701515,
+              "median": 6.525,
+              "min": 4.395833,
+              "max": 8.279167,
+              "p25": 4.6875,
+              "p75": 7.479167,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 20.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 60.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 5778196.51,
+              "min_jerk": 1.17,
+              "ratio": 4949376.9,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0726,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 39925.0,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 20.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 20.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0726,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 4.7,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "20.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "5.07s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 3,
+          "success_rate_pct": 60.0,
+          "collision_count": 1,
+          "collision_rate_pct": 33.3,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 6821507.878022,
+              "std": 8069787.461026,
+              "median": 2283678.478403,
+              "min": 2042192.450977,
+              "max": 16138652.704686,
+              "p25": 2162935.46469,
+              "p75": 9211165.591544,
+              "count": 3
+            },
+            "path_planning_time": {
+              "mean": 5.044085,
+              "std": 0.045104,
+              "median": 5.049849,
+              "min": 5.000294,
+              "max": 5.106765,
+              "p25": 5.000502,
+              "p75": 5.063016,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 7.819444,
+              "std": 2.278997,
+              "median": 8.7125,
+              "min": 5.229167,
+              "max": 9.516667,
+              "p25": 6.970833,
+              "p75": 9.114583,
+              "count": 3
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 33.3,
+              "min_jerk": 100.0,
+              "improvement_pct": 66.7,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 6821507.88,
+              "min_jerk": 0.68,
+              "ratio": 9971963.1,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0441,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 34681.2,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 33.3,
+              "a_star": 0.0,
+              "gap_from_optimal": 33.3,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0441,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 6.0,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "33.3% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "5.04s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "60.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 60% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 2,
+        "sub_phases_total": 3,
+        "recommendation": "ADVANCE TO PHASE 2"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 13,
+        "success_rate_pct": 86.7,
+        "collision_count": 2,
+        "collision_rate_pct": 15.4,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 3838788.649534,
+            "std": 7280333.018543,
+            "median": 548728.227834,
+            "min": 0.37184,
+            "max": 23222619.494974,
+            "p25": 1.919133,
+            "p75": 2283678.478403,
+            "count": 13
+          },
+          "path_planning_time": {
+            "mean": 5.052308,
+            "std": 0.036209,
+            "median": 5.049941,
+            "min": 5.000294,
+            "max": 5.106765,
+            "p25": 5.024348,
+            "p75": 5.077673,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.170192,
+            "std": 1.987624,
+            "median": 6.525,
+            "min": 2.608333,
+            "max": 9.516667,
+            "p25": 4.6875,
+            "p75": 7.479167,
+            "count": 13
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "PRM": {
+      "algorithm": "PRM",
+      "role": "roadmap",
+      "paradigm": "roadmap",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 670928.588751,
+              "std": 1500231.847893,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 3354624.903846,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.039373,
+              "std": 0.021862,
+              "median": 0.05175,
+              "min": 0.010892,
+              "max": 0.060897,
+              "p25": 0.021341,
+              "p75": 0.051984,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.110833,
+              "std": 1.68046,
+              "median": 5.295833,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 670928.59,
+              "min_jerk": 3.83,
+              "ratio": 175248.9,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0394,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 349.0,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0394,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 153.7,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.04s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 4044849.106961,
+              "std": 3989163.665305,
+              "median": 2883247.32542,
+              "min": 1.919133,
+              "max": 9812916.288412,
+              "p25": 1262511.167907,
+              "p75": 6265568.833934,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.074658,
+              "std": 0.044074,
+              "median": 0.066153,
+              "min": 0.012678,
+              "max": 0.13202,
+              "p25": 0.06573,
+              "p75": 0.096709,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.970833,
+              "std": 1.645889,
+              "median": 7.0625,
+              "min": 4.395833,
+              "max": 8.579167,
+              "p25": 6.625,
+              "p75": 8.191667,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 80.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 4044849.11,
+              "min_jerk": 1.17,
+              "ratio": 3464659.4,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0747,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 587.6,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.0747,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 322.4,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.07s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 2,
+          "success_rate_pct": 40.0,
+          "collision_count": 1,
+          "collision_rate_pct": 50.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 4905958.863772,
+              "std": 4055209.866868,
+              "median": 4905958.863772,
+              "min": 2038492.467775,
+              "max": 7773425.259769,
+              "p25": 3472225.665773,
+              "p75": 6339692.06177,
+              "count": 2
+            },
+            "path_planning_time": {
+              "mean": 3.153375,
+              "std": 2.544547,
+              "median": 5.004433,
+              "min": 0.073216,
+              "max": 5.006293,
+              "p25": 0.678457,
+              "p75": 5.004474,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 8.420833,
+              "std": 0.748355,
+              "median": 8.420833,
+              "min": 7.891667,
+              "max": 8.95,
+              "p25": 8.15625,
+              "p75": 8.685417,
+              "count": 2
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 50.0,
+              "min_jerk": 100.0,
+              "improvement_pct": 50.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 4905958.86,
+              "min_jerk": 0.68,
+              "ratio": 7171734.1,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 3.1534,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 21681.4,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 50.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 50.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 3.1534,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 9.5,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "50.0% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "3.15s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "40.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 40% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 2,
+        "sub_phases_total": 3,
+        "recommendation": "ADVANCE TO PHASE 2"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 12,
+        "success_rate_pct": 80.0,
+        "collision_count": 1,
+        "collision_rate_pct": 8.3,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 2782567.183842,
+            "std": 3416280.100154,
+            "median": 1650501.817841,
+            "min": 0.37184,
+            "max": 9812916.288412,
+            "p25": 1.908653,
+            "p75": 4082360.886368,
+            "count": 12
+          },
+          "path_planning_time": {
+            "mean": 1.089135,
+            "std": 2.033115,
+            "median": 0.066153,
+            "min": 0.010892,
+            "max": 5.006293,
+            "p25": 0.051867,
+            "p75": 0.405238,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.4375,
+            "std": 1.925458,
+            "median": 6.627083,
+            "min": 2.608333,
+            "max": 8.95,
+            "p25": 5.077083,
+            "p75": 7.966667,
+            "count": 12
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "APF": {
+      "algorithm": "APF",
+      "role": "reactive",
+      "paradigm": "reactive",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 229240.013675,
+              "std": 317113.209874,
+              "median": 74371.375788,
+              "min": 19951.854637,
+              "max": 773236.341638,
+              "p25": 33598.467775,
+              "p75": 245042.028535,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.120212,
+              "std": 0.047741,
+              "median": 0.126228,
+              "min": 0.058663,
+              "max": 0.174533,
+              "p25": 0.086606,
+              "p75": 0.155031,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.223333,
+              "std": 1.707433,
+              "median": 5.404167,
+              "min": 2.675,
+              "max": 6.7875,
+              "p25": 4.5375,
+              "p75": 6.7125,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.123656,
+              "std": 0.145812,
+              "median": 1.098388,
+              "min": 0.974046,
+              "max": 1.323801,
+              "p25": 1.063022,
+              "p75": 1.159022,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 229240.01,
+              "min_jerk": 3.83,
+              "ratio": 59878.3,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.1202,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 1065.6,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.1202,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 50.4,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.1237,
+              "a_star": 1.0,
+              "optimality_gap_pct": 12.4,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.12s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 0,
+          "success_rate_pct": 0.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": null,
+            "path_planning_time": {
+              "mean": 5.001056,
+              "std": 0.000704,
+              "median": 5.000816,
+              "min": 5.000637,
+              "max": 5.002301,
+              "p25": 5.000652,
+              "p75": 5.000875,
+              "count": 5
+            },
+            "path_execution_time": null,
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": null,
+              "min_jerk": 80.0,
+              "improvement_pct": null,
+              "better_than_floor": null
+            },
+            "MSJ": {
+              "algorithm": null,
+              "min_jerk": 1.17,
+              "ratio": null,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0011,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 39361.6,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": null,
+              "a_star": 0.0,
+              "gap_from_optimal": null,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0011,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 4.8,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": false,
+              "value": "N/A"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "5.00s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "0.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 0% < 80%"
+            ]
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 0,
+          "success_rate_pct": 0.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": null,
+            "path_planning_time": {
+              "mean": 5.001279,
+              "std": 0.000854,
+              "median": 5.001529,
+              "min": 5.000382,
+              "max": 5.00243,
+              "p25": 5.000478,
+              "p75": 5.001576,
+              "count": 5
+            },
+            "path_execution_time": null,
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": null,
+              "min_jerk": 100.0,
+              "improvement_pct": null,
+              "better_than_floor": null
+            },
+            "MSJ": {
+              "algorithm": null,
+              "min_jerk": 0.68,
+              "ratio": null,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0013,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 34386.9,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": null,
+              "a_star": 0.0,
+              "gap_from_optimal": null,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 5.0013,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 6.0,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": false,
+              "value": "N/A"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "5.00s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "0.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 0% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 1,
+        "sub_phases_total": 3,
+        "recommendation": "EXCLUDE \u2014 does not pass enough sub-phases"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 5,
+        "success_rate_pct": 33.3,
+        "collision_count": 0,
+        "collision_rate_pct": 0.0,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 229240.013675,
+            "std": 317113.209874,
+            "median": 74371.375788,
+            "min": 19951.854637,
+            "max": 773236.341638,
+            "p25": 33598.467775,
+            "p75": 245042.028535,
+            "count": 5
+          },
+          "path_planning_time": {
+            "mean": 3.374182,
+            "std": 2.381799,
+            "median": 5.000637,
+            "min": 0.058663,
+            "max": 5.00243,
+            "p25": 0.164782,
+            "p75": 5.001202,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 5.223333,
+            "std": 1.707433,
+            "median": 5.404167,
+            "min": 2.675,
+            "max": 6.7875,
+            "p25": 4.5375,
+            "p75": 6.7125,
+            "count": 5
+          },
+          "path_optimality_ratio": {
+            "mean": 1.123656,
+            "std": 0.145812,
+            "median": 1.098388,
+            "min": 0.974046,
+            "max": 1.323801,
+            "p25": 1.063022,
+            "p75": 1.159022,
+            "count": 4
+          }
+        }
+      }
+    },
+    "CHOMP": {
+      "algorithm": "CHOMP",
+      "role": "optimization",
+      "paradigm": "optimization",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 124535.770176,
+              "std": 278460.363198,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 622660.810968,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 0.560684,
+              "std": 0.445473,
+              "median": 0.368208,
+              "min": 0.330179,
+              "max": 1.356192,
+              "p25": 0.348127,
+              "p75": 0.400714,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.165833,
+              "std": 1.692486,
+              "median": 5.570833,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 124535.77,
+              "min_jerk": 3.83,
+              "ratio": 32529.2,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 0.5607,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 4970.2,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 0.5607,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 10.8,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "0.56s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 4928389.702578,
+              "std": 9268268.825129,
+              "median": 412856.599117,
+              "min": 1.919133,
+              "max": 21396706.318848,
+              "p25": 181756.166852,
+              "p75": 2650627.508939,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 4.584711,
+              "std": 5.004266,
+              "median": 0.967452,
+              "min": 0.896985,
+              "max": 10.093342,
+              "p25": 0.926115,
+              "p75": 10.03966,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.438333,
+              "std": 1.463688,
+              "median": 6.516667,
+              "min": 4.395833,
+              "max": 8.0625,
+              "p25": 5.6875,
+              "p75": 7.529167,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 80.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 4928389.7,
+              "min_jerk": 1.17,
+              "ratio": 4221465.7,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 4.5847,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 36084.7,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 4.5847,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 5.2,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "4.58s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 2,
+          "success_rate_pct": 40.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 5691002.31675,
+              "std": 6024658.397563,
+              "median": 5691002.31675,
+              "min": 1430925.509501,
+              "max": 9951079.123999,
+              "p25": 3560963.913125,
+              "p75": 7821040.720375,
+              "count": 2
+            },
+            "path_planning_time": {
+              "mean": 7.285199,
+              "std": 3.863031,
+              "median": 10.091859,
+              "min": 3.031019,
+              "max": 10.118953,
+              "p25": 3.076,
+              "p75": 10.108164,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 7.46875,
+              "std": 1.328771,
+              "median": 7.46875,
+              "min": 6.529167,
+              "max": 8.408333,
+              "p25": 6.998958,
+              "p75": 7.938542,
+              "count": 2
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 100.0,
+              "improvement_pct": 100.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 5691002.32,
+              "min_jerk": 0.68,
+              "ratio": 8319343.2,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 7.2852,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 50090.2,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 7.2852,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 4.1,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "7.29s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "40.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 40% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 2,
+        "sub_phases_total": 3,
+        "recommendation": "ADVANCE TO PHASE 2"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 12,
+        "success_rate_pct": 80.0,
+        "collision_count": 0,
+        "collision_rate_pct": 0.0,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 3053885.999772,
+            "std": 6428579.278914,
+            "median": 297306.382985,
+            "min": 0.37184,
+            "max": 21396706.318848,
+            "p25": 1.908653,
+            "p75": 1735851.00936,
+            "count": 12
+          },
+          "path_planning_time": {
+            "mean": 4.143531,
+            "std": 4.433348,
+            "median": 1.356192,
+            "min": 0.330179,
+            "max": 10.118953,
+            "p25": 0.648849,
+            "p75": 10.065759,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.079861,
+            "std": 1.664358,
+            "median": 6.522917,
+            "min": 2.608333,
+            "max": 8.408333,
+            "p25": 5.283333,
+            "p75": 6.854167,
+            "count": 12
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    },
+    "STOMP": {
+      "algorithm": "STOMP",
+      "role": "optimization",
+      "paradigm": "optimization",
+      "per_subphase": {
+        "sparse": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 691817.972977,
+              "std": 1546941.931029,
+              "median": 1.877211,
+              "min": 0.37184,
+              "max": 3459071.824974,
+              "p25": 0.378263,
+              "p75": 15.412597,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 7.236021,
+              "std": 0.386849,
+              "median": 7.003647,
+              "min": 6.902003,
+              "max": 7.743193,
+              "p25": 6.970617,
+              "p75": 7.560643,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 5.134167,
+              "std": 1.684476,
+              "median": 5.4125,
+              "min": 2.608333,
+              "max": 6.629167,
+              "p25": 4.420833,
+              "p75": 6.6,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000027,
+              "std": 1.4e-05,
+              "median": 1.000024,
+              "min": 1.000015,
+              "max": 1.000044,
+              "p25": 1.000015,
+              "p75": 1.000036,
+              "count": 4
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 20.0,
+              "improvement_pct": 20.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 691817.97,
+              "min_jerk": 3.83,
+              "ratio": 180705.3,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 7.236,
+              "min_jerk_s": 0.000113,
+              "slowdown_factor": 64143.5,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 7.236,
+              "a_star_s": 6.0534,
+              "speedup_vs_astar": 0.8,
+              "faster_than_ceiling": false
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 20.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": false,
+              "value": "7.24s vs 6.05s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "plan time 7.24s >= ceiling 6.05s"
+            ]
+          }
+        },
+        "moderate": {
+          "trials": 5,
+          "success_count": 5,
+          "success_rate_pct": 100.0,
+          "collision_count": 0,
+          "collision_rate_pct": 0.0,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 2810380.425877,
+              "std": 2089039.222396,
+              "median": 2301358.317726,
+              "min": 1.919133,
+              "max": 5356122.293055,
+              "p25": 2074950.237551,
+              "p75": 4319469.361918,
+              "count": 5
+            },
+            "path_planning_time": {
+              "mean": 10.057376,
+              "std": 0.054552,
+              "median": 10.055722,
+              "min": 10.004816,
+              "max": 10.131478,
+              "p25": 10.0059,
+              "p75": 10.088962,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 6.655,
+              "std": 1.604617,
+              "median": 6.608333,
+              "min": 4.395833,
+              "max": 8.304167,
+              "p25": 5.920833,
+              "p75": 8.045833,
+              "count": 5
+            },
+            "path_optimality_ratio": {
+              "mean": 1.000007,
+              "std": NaN,
+              "median": 1.000007,
+              "min": 1.000007,
+              "max": 1.000007,
+              "p25": 1.000007,
+              "p75": 1.000007,
+              "count": 1
+            }
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "min_jerk": 80.0,
+              "improvement_pct": 80.0,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 2810380.43,
+              "min_jerk": 1.17,
+              "ratio": 2407261.8,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 10.0574,
+              "min_jerk_s": 0.000127,
+              "slowdown_factor": 79158.2,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 0.0,
+              "a_star": 0.0,
+              "gap_from_optimal": 0.0,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 10.0574,
+              "a_star_s": 24.0685,
+              "speedup_vs_astar": 2.4,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": 1.0,
+              "a_star": 1.0,
+              "optimality_gap_pct": 0.0,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "0.0% vs 80.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "10.06s vs 24.07s"
+            },
+            "success_rate": {
+              "pass": true,
+              "value": "100.0%"
+            },
+            "overall": "PASS",
+            "fail_reasons": []
+          }
+        },
+        "dense": {
+          "trials": 5,
+          "success_count": 3,
+          "success_rate_pct": 60.0,
+          "collision_count": 1,
+          "collision_rate_pct": 33.3,
+          "metrics": {
+            "path_smoothness_msj": {
+              "mean": 9621384.905501,
+              "std": 9472716.627143,
+              "median": 8268232.063295,
+              "min": 898009.553464,
+              "max": 19697913.099745,
+              "p25": 4583120.80838,
+              "p75": 13983072.58152,
+              "count": 3
+            },
+            "path_planning_time": {
+              "mean": 10.076384,
+              "std": 0.038032,
+              "median": 10.080635,
+              "min": 10.034138,
+              "max": 10.134388,
+              "p25": 10.051915,
+              "p75": 10.080842,
+              "count": 5
+            },
+            "path_execution_time": {
+              "mean": 10.431944,
+              "std": 5.183686,
+              "median": 8.5,
+              "min": 6.491667,
+              "max": 16.304167,
+              "p25": 7.495833,
+              "p75": 12.402083,
+              "count": 3
+            },
+            "path_optimality_ratio": null
+          },
+          "vs_floor_baseline": {
+            "collision_rate": {
+              "algorithm": 33.3,
+              "min_jerk": 100.0,
+              "improvement_pct": 66.7,
+              "better_than_floor": true
+            },
+            "MSJ": {
+              "algorithm": 9621384.91,
+              "min_jerk": 0.68,
+              "ratio": 14064939.4,
+              "note": "higher ratio = rougher path (expected for collision-aware planners)"
+            },
+            "planning_time": {
+              "algorithm_s": 10.0764,
+              "min_jerk_s": 0.000145,
+              "slowdown_factor": 69281.3,
+              "note": "algorithms are expected to be slower than min-jerk"
+            }
+          },
+          "vs_ceiling_baseline": {
+            "collision_rate": {
+              "algorithm": 33.3,
+              "a_star": 0.0,
+              "gap_from_optimal": 33.3,
+              "note": "A* is 0% by construction; closer to 0% = better"
+            },
+            "planning_time": {
+              "algorithm_s": 10.0764,
+              "a_star_s": 30.0632,
+              "speedup_vs_astar": 3.0,
+              "faster_than_ceiling": true
+            },
+            "POR": {
+              "algorithm": null,
+              "a_star": 1.0,
+              "optimality_gap_pct": null,
+              "note": "% extra distance vs A* optimal path"
+            }
+          },
+          "pass_fail": {
+            "collision_vs_floor": {
+              "pass": true,
+              "value": "33.3% vs 100.0%"
+            },
+            "speed_vs_ceiling": {
+              "pass": true,
+              "value": "10.08s vs 30.06s"
+            },
+            "success_rate": {
+              "pass": false,
+              "value": "60.0%"
+            },
+            "overall": "FAIL",
+            "fail_reasons": [
+              "success 60% < 80%"
+            ]
+          }
+        }
+      },
+      "overall_verdict": {
+        "sub_phases_passed": 1,
+        "sub_phases_total": 3,
+        "recommendation": "EXCLUDE \u2014 does not pass enough sub-phases"
+      },
+      "overall_metrics": {
+        "trials": 15,
+        "success_count": 13,
+        "success_rate_pct": 86.7,
+        "collision_count": 1,
+        "collision_rate_pct": 7.7,
+        "metrics": {
+          "path_smoothness_msj": {
+            "mean": 3567318.977752,
+            "std": 5482210.854288,
+            "median": 2074950.237551,
+            "min": 0.37184,
+            "max": 19697913.099745,
+            "p25": 1.919133,
+            "p75": 4319469.361918,
+            "count": 13
+          },
+          "path_planning_time": {
+            "mean": 9.12326,
+            "std": 1.397185,
+            "median": 10.034138,
+            "min": 6.902003,
+            "max": 10.134388,
+            "p25": 7.651918,
+            "p75": 10.080739,
+            "count": 15
+          },
+          "path_execution_time": {
+            "mean": 6.941667,
+            "std": 3.274682,
+            "median": 6.6,
+            "min": 2.608333,
+            "max": 16.304167,
+            "p25": 5.4125,
+            "p75": 8.045833,
+            "count": 13
+          },
+          "path_optimality_ratio": {
+            "mean": 1.000023,
+            "std": 1.5e-05,
+            "median": 1.000015,
+            "min": 1.000007,
+            "max": 1.000044,
+            "p25": 1.000015,
+            "p75": 1.000033,
+            "count": 5
+          }
+        }
+      }
+    }
+  },
+  "rankings": {
+    "sparse": {
+      "lowest_collision_rate": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 0.0
+        },
+        {
+          "rank": 2,
+          "algorithm": "RRT-Connect",
+          "value": 0.0
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT*",
+          "value": 0.0
+        },
+        {
+          "rank": 4,
+          "algorithm": "PRM",
+          "value": 0.0
+        },
+        {
+          "rank": 5,
+          "algorithm": "APF",
+          "value": 0.0
+        },
+        {
+          "rank": 6,
+          "algorithm": "CHOMP",
+          "value": 0.0
+        },
+        {
+          "rank": 7,
+          "algorithm": "STOMP",
+          "value": 0.0
+        }
+      ],
+      "fastest_planning": [
+        {
+          "rank": 1,
+          "algorithm": "PRM",
+          "value": 0.0394
+        },
+        {
+          "rank": 2,
+          "algorithm": "RRT-Connect",
+          "value": 0.0418
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT",
+          "value": 0.0976
+        },
+        {
+          "rank": 4,
+          "algorithm": "APF",
+          "value": 0.1202
+        },
+        {
+          "rank": 5,
+          "algorithm": "CHOMP",
+          "value": 0.5607
+        },
+        {
+          "rank": 6,
+          "algorithm": "RRT*",
+          "value": 5.0402
+        },
+        {
+          "rank": 7,
+          "algorithm": "STOMP",
+          "value": 7.236
+        }
+      ],
+      "smoothest_path": [
+        {
+          "rank": 1,
+          "algorithm": "RRT*",
+          "value": 109749.2535
+        },
+        {
+          "rank": 2,
+          "algorithm": "CHOMP",
+          "value": 124535.7702
+        },
+        {
+          "rank": 3,
+          "algorithm": "APF",
+          "value": 229240.0137
+        },
+        {
+          "rank": 4,
+          "algorithm": "RRT",
+          "value": 385655.0827
+        },
+        {
+          "rank": 5,
+          "algorithm": "PRM",
+          "value": 670928.5888
+        },
+        {
+          "rank": 6,
+          "algorithm": "STOMP",
+          "value": 691817.973
+        },
+        {
+          "rank": 7,
+          "algorithm": "RRT-Connect",
+          "value": 748039.7486
+        }
+      ],
+      "shortest_execution": [
+        {
+          "rank": 1,
+          "algorithm": "RRT*",
+          "value": 5.0775
+        },
+        {
+          "rank": 2,
+          "algorithm": "PRM",
+          "value": 5.1108
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT",
+          "value": 5.1175
+        },
+        {
+          "rank": 4,
+          "algorithm": "STOMP",
+          "value": 5.1342
+        },
+        {
+          "rank": 5,
+          "algorithm": "CHOMP",
+          "value": 5.1658
+        },
+        {
+          "rank": 6,
+          "algorithm": "RRT-Connect",
+          "value": 5.1917
+        },
+        {
+          "rank": 7,
+          "algorithm": "APF",
+          "value": 5.2233
+        }
+      ]
+    },
+    "moderate": {
+      "lowest_collision_rate": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 0.0
+        },
+        {
+          "rank": 2,
+          "algorithm": "RRT-Connect",
+          "value": 0.0
+        },
+        {
+          "rank": 3,
+          "algorithm": "PRM",
+          "value": 0.0
+        },
+        {
+          "rank": 4,
+          "algorithm": "CHOMP",
+          "value": 0.0
+        },
+        {
+          "rank": 5,
+          "algorithm": "STOMP",
+          "value": 0.0
+        },
+        {
+          "rank": 6,
+          "algorithm": "RRT*",
+          "value": 20.0
+        }
+      ],
+      "fastest_planning": [
+        {
+          "rank": 1,
+          "algorithm": "RRT-Connect",
+          "value": 0.0729
+        },
+        {
+          "rank": 2,
+          "algorithm": "PRM",
+          "value": 0.0747
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT",
+          "value": 0.1376
+        },
+        {
+          "rank": 4,
+          "algorithm": "CHOMP",
+          "value": 4.5847
+        },
+        {
+          "rank": 5,
+          "algorithm": "RRT*",
+          "value": 5.0726
+        },
+        {
+          "rank": 6,
+          "algorithm": "STOMP",
+          "value": 10.0574
+        }
+      ],
+      "smoothest_path": [
+        {
+          "rank": 1,
+          "algorithm": "STOMP",
+          "value": 2810380.4259
+        },
+        {
+          "rank": 2,
+          "algorithm": "PRM",
+          "value": 4044849.107
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT",
+          "value": 4147578.9954
+        },
+        {
+          "rank": 4,
+          "algorithm": "CHOMP",
+          "value": 4928389.7026
+        },
+        {
+          "rank": 5,
+          "algorithm": "RRT-Connect",
+          "value": 5686566.529
+        },
+        {
+          "rank": 6,
+          "algorithm": "RRT*",
+          "value": 5778196.5084
+        }
+      ],
+      "shortest_execution": [
+        {
+          "rank": 1,
+          "algorithm": "RRT*",
+          "value": 6.2733
+        },
+        {
+          "rank": 2,
+          "algorithm": "RRT-Connect",
+          "value": 6.33
+        },
+        {
+          "rank": 3,
+          "algorithm": "CHOMP",
+          "value": 6.4383
+        },
+        {
+          "rank": 4,
+          "algorithm": "RRT",
+          "value": 6.64
+        },
+        {
+          "rank": 5,
+          "algorithm": "STOMP",
+          "value": 6.655
+        },
+        {
+          "rank": 6,
+          "algorithm": "PRM",
+          "value": 6.9708
+        }
+      ]
+    },
+    "dense": {
+      "lowest_collision_rate": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 0.0
+        },
+        {
+          "rank": 2,
+          "algorithm": "CHOMP",
+          "value": 0.0
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT*",
+          "value": 33.3333
+        },
+        {
+          "rank": 4,
+          "algorithm": "STOMP",
+          "value": 33.3333
+        },
+        {
+          "rank": 5,
+          "algorithm": "RRT-Connect",
+          "value": 50.0
+        },
+        {
+          "rank": 6,
+          "algorithm": "PRM",
+          "value": 50.0
+        }
+      ],
+      "fastest_planning": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 0.087
+        },
+        {
+          "rank": 2,
+          "algorithm": "PRM",
+          "value": 0.3758
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT-Connect",
+          "value": 0.4337
+        },
+        {
+          "rank": 4,
+          "algorithm": "RRT*",
+          "value": 5.0732
+        },
+        {
+          "rank": 5,
+          "algorithm": "STOMP",
+          "value": 10.0711
+        },
+        {
+          "rank": 6,
+          "algorithm": "CHOMP",
+          "value": 10.1054
+        }
+      ],
+      "smoothest_path": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 2179608.3507
+        },
+        {
+          "rank": 2,
+          "algorithm": "PRM",
+          "value": 4905958.8638
+        },
+        {
+          "rank": 3,
+          "algorithm": "CHOMP",
+          "value": 5691002.3168
+        },
+        {
+          "rank": 4,
+          "algorithm": "RRT*",
+          "value": 6821507.878
+        },
+        {
+          "rank": 5,
+          "algorithm": "RRT-Connect",
+          "value": 7509690.8022
+        },
+        {
+          "rank": 6,
+          "algorithm": "STOMP",
+          "value": 9621384.9055
+        }
+      ],
+      "shortest_execution": [
+        {
+          "rank": 1,
+          "algorithm": "RRT",
+          "value": 6.9896
+        },
+        {
+          "rank": 2,
+          "algorithm": "CHOMP",
+          "value": 7.4688
+        },
+        {
+          "rank": 3,
+          "algorithm": "RRT*",
+          "value": 7.8194
+        },
+        {
+          "rank": 4,
+          "algorithm": "RRT-Connect",
+          "value": 7.8396
+        },
+        {
+          "rank": 5,
+          "algorithm": "PRM",
+          "value": 8.4208
+        },
+        {
+          "rank": 6,
+          "algorithm": "STOMP",
+          "value": 10.4319
+        }
+      ]
+    }
+  },
+  "phase2_recommendations": [
+    {
+      "algorithm": "RRT",
+      "paradigm": "sampling",
+      "sub_phases_passed": 2,
+      "recommendation": "ADVANCE TO PHASE 2",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "RRT-Connect",
+      "paradigm": "sampling",
+      "sub_phases_passed": 2,
+      "recommendation": "ADVANCE TO PHASE 2",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "RRT*",
+      "paradigm": "sampling",
+      "sub_phases_passed": 2,
+      "recommendation": "ADVANCE TO PHASE 2",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "PRM",
+      "paradigm": "roadmap",
+      "sub_phases_passed": 2,
+      "recommendation": "ADVANCE TO PHASE 2",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "CHOMP",
+      "paradigm": "optimization",
+      "sub_phases_passed": 2,
+      "recommendation": "ADVANCE TO PHASE 2",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "APF",
+      "paradigm": "reactive",
+      "sub_phases_passed": 1,
+      "recommendation": "EXCLUDE \u2014 does not pass enough sub-phases",
+      "strengths": [],
+      "weaknesses": []
+    },
+    {
+      "algorithm": "STOMP",
+      "paradigm": "optimization",
+      "sub_phases_passed": 1,
+      "recommendation": "EXCLUDE \u2014 does not pass enough sub-phases",
+      "strengths": [],
+      "weaknesses": []
+    }
+  ]
+}
