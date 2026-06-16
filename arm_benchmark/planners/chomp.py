@@ -2,6 +2,7 @@ import time
 import numpy as np
 import pybullet as p
 from .base import Planner
+from .ompl_planners import OMPLPlanner
 from ..core.types import Trajectory
 
 N_WAYPOINTS = 50
@@ -9,7 +10,7 @@ MAX_ITER = 300
 LEARNING_RATE = 0.15
 SMOOTH_WEIGHT = 0.5
 OBS_WEIGHT = 800.0
-OBS_EPSILON = 0.15       # obstacle influence radius (m)
+OBS_EPSILON = 0.15
 TIME_BUDGET = 10.0
 
 
@@ -26,6 +27,7 @@ class CHOMP(Planner):
         self.obs_w = obs_w
         self.eps = eps
         self.time_budget = time_budget
+        self._seed_planner = OMPLPlanner("RRT-Connect", time_budget=2.0, simplify=True)
 
     def _build_smoothness_matrix(self, n):
         K = np.zeros((n - 2, n))
@@ -34,14 +36,13 @@ class CHOMP(Planner):
         return K.T @ K
 
     def _signed_min_dist(self, world, q):
-        """Signed minimum distance: negative means penetrating."""
         world.set_config(q)
         min_d = 1.0
         for ob in world.obstacles:
             pts = p.getClosestPoints(world.panda, ob.pybullet_body_id,
                                      distance=self.eps + 0.1, physicsClientId=world.cid)
             for cp in pts:
-                min_d = min(min_d, cp[8])   # cp[8] is signed: negative = penetration
+                min_d = min(min_d, cp[8])
         if world.table is not None:
             pts = p.getClosestPoints(world.panda, world.table,
                                      distance=self.eps + 0.1, physicsClientId=world.cid)
@@ -51,7 +52,6 @@ class CHOMP(Planner):
         return min_d
 
     def _obstacle_cost(self, d):
-        """Cost: large when penetrating, decays to zero at epsilon."""
         if d >= self.eps:
             return 0.0
         return (self.eps - d) ** 2
@@ -61,20 +61,29 @@ class CHOMP(Planner):
         cost = 0.0
         grad = np.zeros_like(traj)
         delta = 0.003
-
         for i in range(1, n - 1):
-            q = traj[i]
-            d = self._signed_min_dist(world, q)
+            d = self._signed_min_dist(world, traj[i])
             c = self._obstacle_cost(d)
             if c < 1e-12:
                 continue
             cost += c
             for j in range(dof):
                 dq = np.zeros(dof); dq[j] = delta
-                d_p = self._signed_min_dist(world, q + dq)
-                d_m = self._signed_min_dist(world, q - dq)
+                d_p = self._signed_min_dist(world, traj[i] + dq)
+                d_m = self._signed_min_dist(world, traj[i] - dq)
                 grad[i, j] = (self._obstacle_cost(d_p) - self._obstacle_cost(d_m)) / (2 * delta)
         return cost, grad
+
+    def _resample_to_n(self, waypoints, n):
+        old_n = len(waypoints)
+        if old_n == n:
+            return waypoints.copy()
+        old_t = np.linspace(0, 1, old_n)
+        new_t = np.linspace(0, 1, n)
+        resampled = np.zeros((n, waypoints.shape[1]))
+        for j in range(waypoints.shape[1]):
+            resampled[:, j] = np.interp(new_t, old_t, waypoints[:, j])
+        return resampled
 
     def plan(self, world, start, goal) -> Trajectory:
         start = np.asarray(start, float)
@@ -82,7 +91,17 @@ class CHOMP(Planner):
         n = self.n_wp
         t0 = time.perf_counter()
 
-        traj = np.linspace(start, goal, n)
+        seed = self._seed_planner.plan(world, start, goal)
+        if seed.planning_success:
+            traj = self._resample_to_n(seed.waypoints, n)
+            seed_traj = traj.copy()  # keep for collision revert
+            init_method = "rrt_connect"
+        else:
+            traj = np.linspace(start, goal, n)
+            seed_traj = traj.copy()
+            init_method = "straight_line"
+
+        traj[0] = start; traj[-1] = goal
         A = self._build_smoothness_matrix(n)
         A_inner = A[1:n-1, 1:n-1]
         A_inv = np.linalg.pinv(A_inner + 1e-4 * np.eye(n - 2))
@@ -95,23 +114,24 @@ class CHOMP(Planner):
         for it in range(self.max_iter):
             if time.perf_counter() - t0 > self.time_budget:
                 break
-
             smooth_grad = (A @ traj)[1:n-1]
             obs_cost, obs_grad_full = self._obstacle_cost_and_grad(world, traj)
             obs_grad = obs_grad_full[1:n-1]
-
             total_grad = self.smooth_w * smooth_grad + self.obs_w * obs_grad
             update = A_inv @ total_grad
             traj[1:n-1] -= self.lr * update
             traj[1:n-1] = np.clip(traj[1:n-1], world.lower, world.upper)
             traj[0] = start; traj[-1] = goal
 
+            # collision constraint: revert waypoints that moved into collision
+            for i in range(1, n - 1):
+                if not world.is_collision_free(traj[i]):
+                    traj[i] = seed_traj[i]
+
             total_cost = self.smooth_w * np.sum(smooth_grad**2) + self.obs_w * obs_cost
             if total_cost < best_cost:
                 best_cost = total_cost
                 best_traj = traj.copy()
-
-            # early termination if converged
             if abs(prev_cost - total_cost) < 1e-6 * max(abs(prev_cost), 1):
                 stall_count += 1
                 if stall_count > 5:
@@ -120,6 +140,6 @@ class CHOMP(Planner):
                 stall_count = 0
             prev_cost = total_cost
 
-        return Trajectory(waypoints=best_traj, dt=world.dt, planning_success=True,
+        return Trajectory(waypoints=best_traj, dt=world.dt, planning_success=seed.planning_success,
                           metadata={"iterations": it + 1, "final_cost": float(best_cost),
-                                    "obs_cost": float(obs_cost)})
+                                    "init": init_method})

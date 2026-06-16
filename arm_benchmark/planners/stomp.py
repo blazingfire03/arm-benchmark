@@ -2,6 +2,7 @@ import time
 import numpy as np
 import pybullet as p
 from .base import Planner
+from .ompl_planners import OMPLPlanner
 from ..core.types import Trajectory
 
 N_WAYPOINTS = 50
@@ -10,7 +11,7 @@ MAX_ITER = 100
 SMOOTH_WEIGHT = 1.0
 OBS_WEIGHT = 500.0
 OBS_EPSILON = 0.15
-NOISE_STD = 0.15
+NOISE_STD = 0.10
 TIME_BUDGET = 10.0
 
 
@@ -28,14 +29,13 @@ class STOMP(Planner):
         self.eps = eps
         self.noise_std = noise_std
         self.time_budget = time_budget
+        self._seed_planner = OMPLPlanner("RRT-Connect", time_budget=2.0, simplify=True)
 
     def _smoothness_cost(self, traj):
-        """Acceleration-based smoothness: sum of squared second differences."""
         accel = traj[2:] - 2 * traj[1:-1] + traj[:-2]
         return float(np.sum(accel ** 2))
 
     def _obstacle_cost(self, world, traj):
-        """Per-waypoint obstacle cost using signed distance."""
         cost = 0.0
         for i in range(1, len(traj) - 1):
             world.set_config(traj[i])
@@ -59,6 +59,17 @@ class STOMP(Planner):
         return (self.smooth_w * self._smoothness_cost(traj) +
                 self.obs_w * self._obstacle_cost(world, traj))
 
+    def _resample_to_n(self, waypoints, n):
+        old_n = len(waypoints)
+        if old_n == n:
+            return waypoints.copy()
+        old_t = np.linspace(0, 1, old_n)
+        new_t = np.linspace(0, 1, n)
+        resampled = np.zeros((n, waypoints.shape[1]))
+        for j in range(waypoints.shape[1]):
+            resampled[:, j] = np.interp(new_t, old_t, waypoints[:, j])
+        return resampled
+
     def plan(self, world, start, goal) -> Trajectory:
         start = np.asarray(start, float)
         goal = np.asarray(goal, float)
@@ -66,42 +77,58 @@ class STOMP(Planner):
         t0 = time.perf_counter()
         rng = np.random.default_rng()
 
-        traj = np.linspace(start, goal, n)
+        seed = self._seed_planner.plan(world, start, goal)
+        if seed.planning_success:
+            traj = self._resample_to_n(seed.waypoints, n)
+            seed_traj = traj.copy()
+            init_method = "rrt_connect"
+        else:
+            traj = np.linspace(start, goal, n)
+            seed_traj = traj.copy()
+            init_method = "straight_line"
+
+        traj[0] = start; traj[-1] = goal
         best_cost = self._total_cost(world, traj)
         best_traj = traj.copy()
 
         for it in range(self.max_iter):
             if time.perf_counter() - t0 > self.time_budget:
                 break
-
-            # generate noisy rollouts around current best
             rollout_costs = []
             rollouts = []
             for _ in range(self.n_rollouts):
                 noise = rng.normal(0, self.noise_std, (n, dof))
-                noise[0] = 0; noise[-1] = 0  # pin endpoints
+                noise[0] = 0; noise[-1] = 0
                 candidate = np.clip(best_traj + noise, world.lower, world.upper)
                 candidate[0] = start; candidate[-1] = goal
+                # collision constraint: revert noisy waypoints that collide
+                for i in range(1, n - 1):
+                    if not world.is_collision_free(candidate[i]):
+                        candidate[i] = seed_traj[i]
                 c = self._total_cost(world, candidate)
                 rollout_costs.append(c)
                 rollouts.append(candidate)
 
-            # probability-weighted combination (STOMP update)
             costs = np.array(rollout_costs)
             min_c = costs.min()
-            weights = np.exp(-10.0 * (costs - min_c) / (costs.max() - min_c + 1e-10))
-            weights /= weights.sum()
+            exp_costs = np.exp(-10.0 * (costs - min_c) / (costs.max() - min_c + 1e-10))
+            weights = exp_costs / exp_costs.sum()
 
-            # weighted average of rollouts
             updated = np.zeros_like(traj)
             for w_i, rollout in zip(weights, rollouts):
                 updated += w_i * rollout
             updated[0] = start; updated[-1] = goal
+
+            # collision constraint on the weighted average too
+            for i in range(1, n - 1):
+                if not world.is_collision_free(updated[i]):
+                    updated[i] = seed_traj[i]
 
             cost = self._total_cost(world, updated)
             if cost < best_cost:
                 best_cost = cost
                 best_traj = updated.copy()
 
-        return Trajectory(waypoints=best_traj, dt=world.dt, planning_success=True,
-                          metadata={"iterations": it + 1, "final_cost": float(best_cost)})
+        return Trajectory(waypoints=best_traj, dt=world.dt, planning_success=seed.planning_success,
+                          metadata={"iterations": it + 1, "final_cost": float(best_cost),
+                                    "init": init_method})
