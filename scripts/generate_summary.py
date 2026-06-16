@@ -231,8 +231,15 @@ for sp in SUB_PHASES:
 
     summary["rankings"][sp] = rankings
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.bool_, np.integer)): return int(obj)
+        if isinstance(obj, np.floating): return float(obj)
+        if isinstance(obj, np.ndarray): return obj.tolist()
+        return super().default(obj)
+
 with open(OUTPUT, "w") as f:
-    json.dump(summary, f, indent=2)
+    json.dump(summary, f, indent=2, cls=NumpyEncoder)
 
 print(f"saved: {OUTPUT}")
 print(f"  {len(summary['baselines'])} baselines")
