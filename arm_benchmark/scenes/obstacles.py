@@ -4,18 +4,18 @@ import pybullet as p
 from ..core.types import Obstacle
 
 # PLACEHOLDERS (confirm with Swapnil): obstacles around the arm, some on the table, some in air
-R_MIN, R_MAX = 0.18, 0.50      # radial ring around the arm base (m)
+R_MIN, R_MAX = 0.12, 0.58      # radial ring around the arm base (m)
 REACH = 0.80                   # keep obstacles inside the arm's reachable sphere
-AIR_FRACTION = 0.4             # fraction floating above the table
-Z_AIR = (0.18, 0.55)           # floating height above the table top
-MIN_OBSTACLE_GAP = 0.07
-MAX_ATTEMPTS = 120
+AIR_FRACTION = 0.55             # fraction floating above the table
+Z_AIR = (0.10, 0.70)           # floating height above the table top
+MIN_OBSTACLE_GAP = 0.01
+MAX_ATTEMPTS = 300
 
 SHAPES = ("box", "cylinder", "sphere")
 DIM_RANGES = dict(
-    box=dict(half=(0.06, 0.11)),
-    cylinder=dict(radius=(0.05, 0.075), height=(0.18, 0.34)),
-    sphere=dict(radius=(0.06, 0.10)),
+    box=dict(half=(0.08, 0.15)),
+    cylinder=dict(radius=(0.06, 0.10), height=(0.20, 0.40)),
+    sphere=dict(radius=(0.08, 0.13)),
 )
 
 
