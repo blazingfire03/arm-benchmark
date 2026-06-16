@@ -190,8 +190,8 @@ for algo in TEST_ALGOS:
             "overall": "PASS" if overall_pass else "FAIL",
             "fail_reasons": (
                 [] if overall_pass else
-                ([f"collision {algo_col:.1f}% >= floor {mj_col:.1f}%"] if not col_pass else []) +
-                ([f"plan time {algo_pt:.2f}s >= ceiling {as_pt:.2f}s"] if not pt_pass else []) +
+                (([f"collision {algo_col:.1f}% >= floor {mj_col:.1f}%"] if not col_pass and algo_col is not None else [])) +
+                (([f"plan time {algo_pt:.2f}s >= ceiling {as_pt:.2f}s"] if not pt_pass and algo_pt is not None and as_pt is not None else [])) +
                 ([f"success {success_pct:.0f}% < 80%"] if success_pct < 80 else [])
             ),
         }
