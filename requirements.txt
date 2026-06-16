@@ -1,0 +1,5 @@
+pybullet
+numpy
+# added as we build them:
+# scipy pandas statsmodels matplotlib seaborn scikit-posthocs
+# ompl  (source build with nanobind — not pip)
